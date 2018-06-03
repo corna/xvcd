@@ -5,6 +5,7 @@ all:
 	@echo "make raspi"
 	@echo "make macos"
 	@echo "make slc6"
+	@echo "make localhost"
 
 raspi:
 	$(MAKE) -C src O=$(O) USE_GETIFADDRS=wlan0
@@ -14,5 +15,8 @@ macos:
 
 slc6:
 	$(MAKE) -C src O=$(O) USE_GETIFADDRS=eth0
+
+localhost:
+	$(MAKE) -C src O=$(O) USE_GETIFADDRS=lo
 
 

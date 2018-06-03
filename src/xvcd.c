@@ -388,6 +388,7 @@ int main(int argc, char **argv)
 	int i;
 	int s;
 	int c;
+	int localhost = 1;
 	int port = 2542;
 	int product = -1, vendor = -1, index = 0, interface = 0;
 	unsigned long frequency = 0;
@@ -424,6 +425,9 @@ int main(int argc, char **argv)
 		case 'f':
 			frequency = strtoul(optarg, NULL, 0);
 			break;
+        case 'l':
+            localhost = 0;
+            break;
 		case '?':
 			fprintf(stderr, "usage: %s [-v] [-V vendor] [-P product] [-S serial] [-I index] [-i interface] [-f frequency] [-p port]\n\n", *argv);
 			fprintf(stderr, "          -v: verbosity, increase verbosity by adding more v's\n");
@@ -435,7 +439,8 @@ int main(int argc, char **argv)
 			fprintf(stderr, "              and product IDs on host. Can be used instead of -S but -S is more definitive. (default = 0)\n");
 			fprintf(stderr, "          -i: interface, select which \'port\' on the selected device to use if multiple port device. (default = 0)\n");
 			fprintf(stderr, "          -f: frequency in Hz, force TCK frequency. If set to 0, set from settck commands sent by client. (default = 0)\n");
-			fprintf(stderr, "          -p: TCP port, TCP port to listen for connections from client (default = %d)\n\n", port);
+			fprintf(stderr, "          -p: TCP port, TCP port to listen for connections from client (default = %d)\n", port);
+			fprintf(stderr, "          -l: accept connections from external hosts, not just from localhost\n\n");
 			return 1;
 		}
 
@@ -478,7 +483,11 @@ int main(int argc, char **argv)
 	i = 1;
 	setsockopt(s, SOL_SOCKET, SO_REUSEADDR, &i, sizeof i);
 	
-	address.sin_addr.s_addr = INADDR_ANY;
+	if (localhost)
+		address.sin_addr.s_addr = INADDR_LOOPBACK;
+	else
+		address.sin_addr.s_addr = INADDR_ANY;
+
 	address.sin_port = htons(port);
 	address.sin_family = AF_INET;
 	
